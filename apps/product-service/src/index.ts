@@ -1,13 +1,20 @@
-import express from "express"
+import express,{ Request,Response} from "express"
 import cors from "cors"
 
 const app = express()
 
 app.use(cors({
-    origin:["http://localhost:3002", "http://localhost:3003"],
+    origin:"*",
     credentials:true
 }))
 
-app.listen(8000, () => {
-    console.log("Product service is running on port 8000")
+app.get("/health",(req:Request,res:Response) => {
+    res.status(200).json({
+        uptime:process.uptime(),
+        timestamp:Date.now()
+    })
+})
+
+app.listen(8003, () => {
+    console.log("Product service is running on port 8003")
 })
