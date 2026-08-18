@@ -1,7 +1,8 @@
 import Fastify from "fastify"
 import {getAuth, clerkPlugin, clerkClient} from "@clerk/fastify"
+import { shouldBeAuthenticated } from "./middleware/authMiddleware.js"
 
-const fastify = Fastify({logger:true})
+const fastify = Fastify()
 
 fastify.register(clerkPlugin)
 
@@ -12,18 +13,12 @@ fastify.get("/health",(request,reply) => {
     })
 })
 
-fastify.get("/test",async(request,reply) => {
+fastify.get("/test",{preValidation:[shouldBeAuthenticated]},async(request,reply) => {
     try{
-        const {isAuthenticated, userId} = getAuth(request)
-        if(!isAuthenticated){
-            return reply.code(401).send({
-                error:"route is not authenticated"
-            })
-        }
-        const user = await clerkClient.users.getUser(userId)
+    
         return reply.code(200).send({
             message: "route is authenticated",
-            user,
+            userId: request.userId,
         })
     }catch(err){
         fastify.log.error(err)
