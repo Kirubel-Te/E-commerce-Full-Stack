@@ -2,15 +2,23 @@
   "name": "@repo/db",
   "version": "0.0.0",
   "type": "module",
-  "scripts":{
+  "scripts": {
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy":"prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy"
   },
   "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
     "prisma": "^7.9.1"
   },
   "dependencies": {
-    "@prisma/client": "^7.9.1"
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "@types/node": "^26.2.0",
+    "dotenv": "^17.4.2",
+    "pg": "^8.23.0"
+  },
+  "exports": {
+    ".": "./src/index.ts"
   }
 }
