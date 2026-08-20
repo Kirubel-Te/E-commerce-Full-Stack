@@ -1,6 +1,8 @@
 import Fastify from "fastify"
 import {getAuth, clerkPlugin, clerkClient} from "@clerk/fastify"
 import { shouldBeAuthenticated } from "./middleware/authMiddleware.js"
+import { orderRoute } from "./routes/order.js"
+import { connectToDatabase } from "@repo/order-db"
 
 const fastify = Fastify()
 
@@ -27,9 +29,11 @@ fastify.get("/test",{preValidation:[shouldBeAuthenticated]},async(request,reply)
         })
     }
 })
+fastify.register(orderRoute)
 
 const start = async()=>{
     try{
+        await connectToDatabase()
         await fastify.listen({port:8001})
         console.log("Order service is running on port 8001")
 
