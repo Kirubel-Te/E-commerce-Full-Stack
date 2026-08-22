@@ -3,7 +3,7 @@ import { createMiddleware } from 'hono/factory'
 import type {CustomJwtSessionClaims} from "@repo/types"
 
 export const shouldBeAuthenticated = createMiddleware<{ Variables:{ userId: string } }>(async (c,next) => {
-    const { userId } = getAuth(c)
+    const { userId ,isAuthenticated} = getAuth(c)
 
   if (!userId) {
     return c.json({

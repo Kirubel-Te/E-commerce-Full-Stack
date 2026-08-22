@@ -2,9 +2,12 @@ import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { shouldBeAuthenticated } from './middleware/authMiddleware.js'
+import sessionRoute from './routes/session.route.js'
+import { cors } from 'hono/cors'
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
+app.use("*",cors({origin:"http://localhost:3002"}))
 
 app.get('/health', (c) => {
   return c.json({
@@ -13,6 +16,7 @@ app.get('/health', (c) => {
     timestamp:Date.now()
   })
 })
+app.route("/session",sessionRoute)
 
 app.get('/test',shouldBeAuthenticated, (c) => {
   
