@@ -7,7 +7,10 @@ import { cors } from 'hono/cors'
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
-app.use("*",cors({origin:"http://localhost:3002"}))
+app.use("*", cors({
+  origin: "http://localhost:3002",
+  credentials: true,
+}))
 
 app.get('/health', (c) => {
   return c.json({
