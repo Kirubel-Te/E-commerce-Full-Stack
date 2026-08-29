@@ -4,6 +4,7 @@ import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { shouldBeAuthenticated } from './middleware/authMiddleware.js'
 import sessionRoute from './routes/session.route.js'
 import { cors } from 'hono/cors'
+import stripe from './utils/stripe'
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
@@ -18,6 +19,17 @@ app.get('/health', (c) => {
     uptime:process.uptime(),
     timestamp:Date.now()
   })
+})
+app.post("/create-stripe-product",async(c) => {
+  const res = await stripe.products.create({
+    id:"1",
+    name:"test-tshirt",
+    default_price_data:{
+      currency: "usd",
+      unit_amount: 59 * 100,
+    },
+  })
+  return c.json(res)
 })
 app.route("/session",sessionRoute)
 
