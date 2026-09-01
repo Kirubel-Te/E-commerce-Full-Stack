@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { shouldBeAuthenticated } from './middleware/authMiddleware.js'
 import sessionRoute from './routes/session.route.js'
+import webhooksRoute from './routes/webhooks.route.js'
 import { cors } from 'hono/cors'
 import stripe from './utils/stripe'
 
@@ -21,6 +22,7 @@ app.get('/health', (c) => {
   })
 })
 app.route("/session",sessionRoute)
+app.route("/webhooks",webhooksRoute)
 
 app.get('/test',shouldBeAuthenticated, (c) => {
   
