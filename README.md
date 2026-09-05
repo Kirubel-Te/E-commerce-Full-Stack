@@ -1,159 +1,154 @@
-# Turborepo starter
+# E-commerce platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+This repository contains a full-stack e-commerce platform managed as a pnpm monorepo with [Turborepo](https://turborepo.dev/). It includes a customer storefront, an administration dashboard, backend services, shared TypeScript types, and database packages.
 
-## Using this example
+## Architecture
 
-Run the following command:
+```text
+Customer storefront (Next.js :3002) ─┐
+                                     ├─ Product service (:8004)
+Admin dashboard (Next.js :3003) ────┤  Order service (:8001)
+                                     └─ Payment service (:8002) ── Stripe
 
-```sh
-npx create-turbo@latest
+Product data ── PostgreSQL + Prisma (@repo/db)
+Order data   ── PostgreSQL (@repo/order-db)
+Shared contracts ── @repo/types
+Authentication ── Clerk
 ```
 
-## What's inside?
+## Repository structure
 
-This Turborepo includes the following packages/apps:
+### Applications and services
 
-### Apps and Packages
+- `apps/e-commerce-ui` - Customer-facing Next.js storefront. Runs on port `3002`.
+- `apps/Ecom-admin` - Next.js administration dashboard for products, users, orders, and payments. Runs on port `3003`.
+- `apps/product-service` - Express API for products and categories. Runs on port `8004`.
+- `apps/order-service` - Fastify API for orders. Runs on port `8001`.
+- `apps/payment-service` - Hono API for Stripe checkout sessions. Runs on port `8002`.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Shared packages
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+- `packages/product-db` (`@repo/db`) - Prisma client, schema, and product migrations for PostgreSQL.
+- `packages/order-db` (`@repo/order-db`) - Order database connection and model package.
+- `packages/types` (`@repo/types`) - Shared TypeScript and Zod contracts for authentication, carts, and products.
+- `packages/kafka` (`@repo/kafka`) - KafkaJS-based shared messaging package.
+- `packages/eslint-config` - Shared ESLint configurations.
+- `packages/typescript-config` - Shared TypeScript compiler configurations.
 
-### Utilities
+## Requirements
 
-This Turborepo has some additional tools already setup for you:
+- Node.js `>=18`
+- pnpm `9.x`
+- PostgreSQL
+- Clerk application credentials
+- Stripe secret key for payment flows
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Getting started
 
-### Build
+From the repository root:
 
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+pnpm install
 ```
 
-Without global `turbo`, use your package manager:
+Create `.env` files where each service expects them. At minimum, the payment service requires:
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm dlx turbo build
-pnpm exec turbo build
+```env
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+STRIPE_SECRET_KEY=your_stripe_secret_key
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Configure the PostgreSQL connection values required by the Prisma and order database packages. Do not commit `.env` files or secret keys.
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+Generate the Prisma client and apply local migrations:
 
-```sh
-turbo build --filter=docs
+```bash
+pnpm --filter @repo/db db:generate
+pnpm --filter @repo/db db:migrate
 ```
 
-Without global `turbo`:
+Start the development applications and services:
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+pnpm dev
 ```
 
-### Develop
+Turborepo starts every package with a `dev` script. You can also run one workspace at a time:
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+pnpm --filter ecomgithub dev          # Storefront: http://localhost:3002
+pnpm --filter admin dev               # Admin: http://localhost:3003
+pnpm --filter product-service dev    # Product API: http://localhost:8004
+pnpm --filter order-service dev      # Order API: http://localhost:8001
+pnpm --filter payment-service dev    # Payment API: http://localhost:8002
 ```
 
-Without global `turbo`, use your package manager:
+## Common commands
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+Run these from the repository root:
+
+```bash
+pnpm dev              # Start all development processes
+pnpm build            # Build all apps and packages
+pnpm lint             # Lint all workspaces
+pnpm check-types      # Type-check all workspaces
+pnpm format           # Format TypeScript and Markdown files
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+Use Turborepo filters for a focused task:
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
+```bash
+pnpm exec turbo build --filter=admin
+pnpm exec turbo check-types --filter=product-service
 ```
 
-Without global `turbo`:
+For a production payment service build:
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm --filter payment-service build
+pnpm --filter payment-service start
 ```
 
-### Remote Caching
+## API overview
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+All services expose a health endpoint:
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
+```text
+GET http://localhost:8001/health
+GET http://localhost:8002/health
+GET http://localhost:8004/health
 ```
 
-Without global `turbo`, use your package manager:
+The main backend areas are:
 
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
+- Product service: `/product` and `/category`
+- Order service: order routes registered by the service
+- Payment service: `POST /session/create-checkout-session`
+
+Protected routes use Clerk authentication. The payment service uses Stripe to create checkout sessions from cart data.
+
+## Database workflow
+
+The product Prisma schema is in `packages/product-db/prisma/schema.prisma`. For local development, use:
+
+```bash
+pnpm --filter @repo/db db:generate
+pnpm --filter @repo/db db:migrate
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+For deployment, apply committed migrations with:
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
+```bash
+pnpm --filter @repo/db db:deploy
 ```
 
-Without global `turbo`:
+## Technology stack
 
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+- TypeScript across the monorepo
+- Next.js, React, Tailwind CSS, and Zustand for the web applications
+- Express, Fastify, and Hono for backend services
+- PostgreSQL with Prisma
+- Clerk for authentication
+- Stripe for payments
+- Turborepo and pnpm for workspace management
