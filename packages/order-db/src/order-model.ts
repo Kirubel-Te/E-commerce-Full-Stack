@@ -8,8 +8,8 @@ export const status = ["success","failed"] as const
 const OrderSchema = new Schema({
     userId:{type:String, required:true},
     email:{type:String , required: true},
-    amount:{type:Number, requried:true},
-    status:{type:String, requried:true, enum:status},
+    amount:{type:Number, required:true},
+    status:{type:String, required:true, enum:status},
     products:{type:[
         {
             name:{type:String, required:true},
