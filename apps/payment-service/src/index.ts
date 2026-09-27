@@ -7,6 +7,8 @@ import webhooksRoute from './routes/webhooks.route.js'
 import { cors } from 'hono/cors'
 import stripe from './utils/stripe'
 import { consumer,producer } from './utils/kafka.js'
+import { runKafkaSubscriptions } from './utils/subscriptions.js'
+
 
 const app = new Hono()
 app.use('*', clerkMiddleware())
@@ -37,6 +39,7 @@ app.get('/test',shouldBeAuthenticated, (c) => {
 const start = async () => {
   try{
     Promise.all([await producer.connectProducer(),await consumer.connectConsumer()])
+    await runKafkaSubscriptions()
     serve({
       fetch: app.fetch,
       port: 8002
