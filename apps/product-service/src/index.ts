@@ -4,6 +4,7 @@ import cors from "cors"
 import { router as categoryRouter } from "./routes/category.route.js"
 import { router as productRouter } from "./routes/product.route.js"
 import { shouldBeAuthenticated } from "./middleware/authMiddleware.js"
+import { producer, consumer } from "./utils/kafka.js"
 
 const app = express()
 
@@ -38,6 +39,15 @@ app.use((err:any, req:Request, res:Response, next:NextFunction) => {
     })
 })
 
-app.listen(8004, () => {
-    console.log("Product service is running on port 8000")
-})
+const start = async() => {
+    try{
+        Promise.all([await producer.connectProducer(),await consumer.connectConsumer()])
+        app.listen(8004, () => {
+            console.log("Product service is running on port 8004")
+        })
+    }catch(err){
+        console.log("Error starting server:",err)
+        process.exit(1)
+    }
+}
+start()

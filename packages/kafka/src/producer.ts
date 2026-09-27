@@ -5,6 +5,7 @@ export const createProducer = (kafka:Kafka) => {
 
     const connectProducer = async() => {
         await producer.connect()
+        console.log(`Producer connected to Kafka`)
     }
     const sendMessage = async(topic:string,message:object) => {
         await producer.send({

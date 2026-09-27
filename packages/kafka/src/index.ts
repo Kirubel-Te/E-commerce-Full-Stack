@@ -1,3 +1,3 @@
-import {createConsumer} from './consumer'
-import {createProducer} from './producer'
-import {createKafkaClient} from './client'
+export {createConsumer} from './consumer'
+export {createProducer} from './producer'
+export {createKafkaClient} from './client'
