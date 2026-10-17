@@ -16,11 +16,14 @@ app.use(express.json())
 app.use(clerkMiddleware())
 app.get("/health",(req:Request,res:Response) => {
     res.status(200).json({
-        uptime:process.uptime(),
-        timestamp:Date.now()
+        message:"Product service is healthy",
     })
 })
-
+app.get("/health",(req:Request,res:Response) => {
+    res.status(200).json({
+        message:"Product service is healthy",
+    })
+})
 app.get("/test",shouldBeAuthenticated,(req:Request,res:Response) => {
     
     res.status(200).json({
