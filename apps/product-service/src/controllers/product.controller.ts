@@ -20,16 +20,15 @@ export const createProduct = async (req: Request, res: Response) =>{
     }
 
     const product = await prisma.product.create({data})
-    res.status(201).json(product)
 
     const stripeProduct: StripeProductType = {
         id: product.id.toString(),
         name: product.name,
-        price: product.price,
+        price: Number(product.price),
     };
 
     producer.sendMessage("product.created", { value: stripeProduct });
-    res.status(201).json(product);
+    res.status(201).json({ ...product, price: Number(product.price) });
 
 }
 export const deleteProduct = async (req: Request, res: Response) =>{
@@ -52,7 +51,7 @@ export const updateProduct = async (req: Request, res: Response) =>{
         },
         data
     })
-    res.status(200).json(updatedProduct)
+    res.status(200).json({ ...updatedProduct, price: Number(updatedProduct.price) })
 }
 
 export const getProduct = async (req: Request, res: Response) =>{
@@ -65,7 +64,7 @@ export const getProduct = async (req: Request, res: Response) =>{
     if(!product){
         return res.status(404).json({message:"Product not found"})
     }
-    res.status(200).json(product)
+    res.status(200).json({ ...product, price: Number(product.price) })
 }
 
 export const getAllProduct = async (req: Request, res: Response) =>{
@@ -96,5 +95,7 @@ export const getAllProduct = async (req: Request, res: Response) =>{
         orderBy,
         take: limit ? Number(limit) : undefined
     })
-    res.status(200).json(products)
+    res.status(200).json(
+        products.map((product) => ({ ...product, price: Number(product.price) }))
+    )
 }

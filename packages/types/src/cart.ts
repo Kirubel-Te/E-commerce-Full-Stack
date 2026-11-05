@@ -1,6 +1,6 @@
-import type { Product } from "@repo/db";
+import type { ProductType } from "./products"
 
-export type CartItemType = Product & {
+export type CartItemType = ProductType & {
     quantity:number;
     selectedSize: string;
     selectedColor: string;

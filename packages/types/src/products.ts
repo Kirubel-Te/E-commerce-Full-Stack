@@ -1,5 +1,4 @@
 import type{Product,Category} from "@repo/db"
-import type { CartItemType , CartItemsType} from "./cart"
 import {z} from "zod"
 
 export type StripeProductType = {
@@ -7,7 +6,11 @@ export type StripeProductType = {
     name:string,
     price:number
 }
-export type ProductType = Product
+export type ProductType = Omit<Product, "price" | "createdAt" | "updatedAt"> & {
+  price: number
+  createdAt: string
+  updatedAt: string
+}
 export type CategoryType = Category 
 export type ProductsType = ProductType[];
 export const shippingFormSchema = z.object({
@@ -39,5 +42,3 @@ export const paymentFormSchema = z.object({
 });
 
 export type PaymentFormInputs = z.infer<typeof paymentFormSchema>;
-
-
