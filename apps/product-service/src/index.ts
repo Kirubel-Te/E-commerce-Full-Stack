@@ -33,7 +33,7 @@ app.get("/test",shouldBeAuthenticated,(req:Request,res:Response) => {
 })
 
 app.use("/category",categoryRouter)
-app.use("/product",productRouter)
+app.use("/product",productRouter);
 
 app.use((err:any, req:Request, res:Response, next:NextFunction) => {
     console.error(err)
