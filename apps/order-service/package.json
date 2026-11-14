@@ -13,16 +13,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@repo/types": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@repo/types":"workspace:*",
     "@types/node": "^20",
     "tsx": "^4.23.12",
     "typescript": "^7.0.2"
   },
   "dependencies": {
     "@clerk/fastify": "^3.1.68",
-    "fastify": "^5.12.0",
-    "@repo/order-db":"workspace:*",
-    "@repo/kafka": "workspace:*"
+    "@repo/kafka": "workspace:*",
+    "@repo/order-db": "workspace:*",
+    "date-fns": "^4.4.0",
+    "fastify": "^5.12.0"
   }
 }
