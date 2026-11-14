@@ -10,7 +10,8 @@ export const orderRoute = async (fastify:FastifyInstance) => {
         return reply.send(orders)
     })
     fastify.get("/orders",{preHandler:shouldBeAdmin},async (request,reply) => {
-        const order = await Order.find()
+      const { limit } = request.query as { limit: number }  
+      const order = await Order.find().limit(limit).sort({ createdAt: -1})
         return reply.send(order)
     })
 
