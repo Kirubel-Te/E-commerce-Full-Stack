@@ -1,44 +1,102 @@
-import type{Product,Category} from "@repo/db"
-import {z} from "zod"
+import type { Product, Category } from "@repo/db";
+import z from "zod";
+
+export type ProductType = Product;
+
+export type ProductsType = ProductType[];
 
 export type StripeProductType = {
-    id:string,
-    name:string,
-    price:number
-}
-export type ProductType = Omit<Product, "price" | "createdAt" | "updatedAt"> & {
-  price: number
-  createdAt: string
-  updatedAt: string
-}
-export type CategoryType = Category 
-export type ProductsType = ProductType[];
-export const shippingFormSchema = z.object({
-  name: z.string().min(1, "Name is required!"),
-  email: z.email().min(1, "Email is required!"),
-  phone: z
-    .string()
-    .min(7, "Phone number must be between 7 and 10 digits!")
-    .max(10, "Phone number must be between 7 and 10 digits!")
-    .regex(/^\d+$/, "Phone number must contain only numbers!"),
-  address: z.string().min(1, "Address is required!"),
-  city: z.string().min(1, "City is required!"),
-});
-export type ShippingFormInputs = z.infer<typeof shippingFormSchema>;
+  id: string;
+  name: string;
+  price: number;
+};
 
-export const paymentFormSchema = z.object({
-  cardHolder: z.string().min(1, "Card holder is required!"),
-  cardNumber: z
-    .string()
-    .min(16, "Card Number is required!")
-    .max(16, "Card Number is required!"),
-  expirationDate: z
-    .string()
-    .regex(
-      /^(0[1-9]|1[0-2])\/\d{2}$/,
-      "Expiration date must be in MM/YY format!"
-    ),
-  cvv: z.string().min(3, "CVV is required!").max(3, "CVV is required!"),
-});
+export const colors = [
+  "blue",
+  "green",
+  "red",
+  "yellow",
+  "purple",
+  "orange",
+  "pink",
+  "brown",
+  "gray",
+  "black",
+  "white",
+] as const;
 
-export type PaymentFormInputs = z.infer<typeof paymentFormSchema>;
+export const sizes = [
+  "xs",
+  "s",
+  "m",
+  "l",
+  "xl",
+  "xxl",
+  "34",
+  "35",
+  "36",
+  "37",
+  "38",
+  "39",
+  "40",
+  "41",
+  "42",
+  "43",
+  "44",
+  "45",
+  "46",
+  "47",
+  "48",
+] as const;
+
+export const ProductFormSchema = z
+  .object({
+    name: z
+      .string({ message: "Product name is required!" })
+      .min(1, { message: "Product name is required!" }),
+    shortDescription: z
+      .string({ message: "Short description is required!" })
+      .min(1, { message: "Short description is required!" })
+      .max(60),
+    description: z
+      .string({ message: "Description is required!" })
+      .min(1, { message: "Description is required!" }),
+    price: z
+      .number({ message: "Price is required!" })
+      .min(1, { message: "Price is required!" }),
+    categorySlug: z
+      .string({ message: "Category is required!" })
+      .min(1, { message: "Category is required!" }),
+    sizes: z
+      .array(z.enum(sizes))
+      .min(1, { message: "At least one size is required!" }),
+    colors: z
+      .array(z.enum(colors))
+      .min(1, { message: "At least one color is required!" }),
+    images: z.record(z.string(), z.string(), {
+      message: "Image for each color is required!",
+    }),
+  })
+  .refine(
+    (data) => {
+      const missingImages = data.colors.filter(
+        (color: string) => !data.images?.[color]
+      );
+      return missingImages.length === 0;
+    },
+    {
+      message: "Image is required for each selected color!",
+      path: ["images"],
+    }
+  );
+
+export type CategoryType = Category;
+
+export const CategoryFormSchema = z.object({
+  name: z
+    .string({ message: "Name is Required!" })
+    .min(1, { message: "Name is Required!" }),
+  slug: z
+    .string({ message: "Slug is Required!" })
+    .min(1, { message: "Slug is Required!" }),
+});
